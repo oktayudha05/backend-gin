@@ -29,11 +29,7 @@ type Mahasiswa struct{
 	Prodi string `json:"prodi"`
 }
 
-var mahasiswas = []Mahasiswa{
-	{Nama: "Oktario", NPM: 2320506044, Prodi: "Teknologi Informasi"},
-	{Nama: "Bambang", NPM: 2320506046, Prodi: "Teknologi Informasi"},
-	{Nama: "Istoro", NPM: 2340506088, Prodi: "Teknologi Informasi"},
-}
+var mahasiswas = []Mahasiswa{}
 
 // get mahasiswa
 func getMahasiswa(c *gin.Context){
@@ -48,6 +44,13 @@ func postMahasiswa(c *gin.Context){
 	if err != nil{
 		panic(err)
 	}
+	for _, m := range mahasiswas {
+		if m.NPM == newMahasiswa.NPM {
+			c.IndentedJSON(http.StatusConflict, gin.H{"message": "gagal menaruh data, NPM sudah terdaftar"})
+			return
+		}
+	}
+
 	mahasiswas = append(mahasiswas, newMahasiswa)
 	c.IndentedJSON(http.StatusCreated, newMahasiswa)
 }
@@ -82,10 +85,12 @@ func deleteMahasiswaByNpm(c *gin.Context){
 		return
 	}
 
+	var nama string
 	index := -1
 	for i, a := range mahasiswas {
 		if a.NPM == uint(npmUint) {
 			index = i
+			nama = a.Nama
 			break
 		}
 	}
@@ -95,5 +100,5 @@ func deleteMahasiswaByNpm(c *gin.Context){
 	}
 
 	mahasiswas = append(mahasiswas[:index], mahasiswas[index+1:]...)
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "mahasiswa berhasil dihapus"})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": nama + " telah berhasil dihapus"})
 }
