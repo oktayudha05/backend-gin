@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var db = database.GetDb()
+var dbMhs = database.GetDbMhs()
 var validate *validator.Validate
 
 func init(){
@@ -22,7 +22,7 @@ func init(){
 // get mahasiswa
 func GetMahasiswa(c *gin.Context){
 	var mahasiswas []models.Mahasiswa
-	cur, err := db.Find(context.Background(), bson.M{})
+	cur, err := dbMhs.Find(context.Background(), bson.M{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "gagal ambil data"})
 		return
@@ -36,7 +36,7 @@ func GetMahasiswa(c *gin.Context){
 	}
 	
 	if len(mahasiswas) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"message": "belum ada mahasiswa"})
+		c.JSON(http.StatusNoContent, gin.H{"message": "belum ada mahasiswa"})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, mahasiswas)
@@ -58,7 +58,7 @@ func PostMahasiswa(c *gin.Context){
 		return
 	}
 
-	count, err := db.CountDocuments(context.Background(), bson.M{"npm": newMahasiswa.NPM})
+	count, err := dbMhs.CountDocuments(context.Background(), bson.M{"npm": newMahasiswa.NPM})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "gagal cek npm"})
 		return
@@ -68,7 +68,7 @@ func PostMahasiswa(c *gin.Context){
 		return
 	}
 
-	_, err = db.InsertOne(context.Background(), newMahasiswa)
+	_, err = dbMhs.InsertOne(context.Background(), newMahasiswa)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "gagal simpan data ke database"})
 		return
@@ -88,7 +88,7 @@ func GetMahasiswaByNpm(c *gin.Context){
 	}
 
 	var mahasiswa models.Mahasiswa
-	err = db.FindOne(context.Background(), bson.M{"npm": uint(npmUint)}).Decode(&mahasiswa)
+	err = dbMhs.FindOne(context.Background(), bson.M{"npm": uint(npmUint)}).Decode(&mahasiswa)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "mahasiswa dengan npm " + npm + " tidak ditemukan"})
 		return
@@ -106,7 +106,7 @@ func DeleteMahasiswaByNpm(c *gin.Context){
 		return
 	}
 
-	result, err := db.DeleteOne(context.Background(), bson.M{"npm": uint(npmUint)})
+	result, err := dbMhs.DeleteOne(context.Background(), bson.M{"npm": uint(npmUint)})
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{"message": "gagal menghapus data mahasiswa"})
 		return

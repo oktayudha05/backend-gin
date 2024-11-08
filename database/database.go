@@ -11,7 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var db *mongo.Collection
+var (
+	dbDosen *mongo.Collection
+	dbMhs   *mongo.Collection
+)
 
 func init() {
 	ctx, cancle := context.WithTimeout(context.Background(), 5*time.Second)
@@ -34,15 +37,14 @@ func init() {
 		log.Fatal(err)
 	}
 
-	db = client.Database("backend-gin").Collection("mahasiswa")
-	if db == nil {
-		log.Fatal("MongoDB collection 'mahasiswa' is not initialized")
-	}
+	db := client.Database("backend-gin")
+	dbDosen = db.Collection("dosen")
+	dbMhs = db.Collection("mahasiswa")
 }
 
-func GetDb() *mongo.Collection {
-	if db == nil {
-		log.Fatal("Database connection is not initialized. Call InitDB() first.")
-	}
-	return db
+func GetDbDosen() *mongo.Collection {
+	return dbDosen
+}
+func GetDbMhs() *mongo.Collection {
+	return dbMhs
 }

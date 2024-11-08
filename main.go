@@ -23,5 +23,13 @@ func main(){
 		mahasiswaGroup.DELETE("/:npm", controllers.DeleteMahasiswaByNpm)
 	}
 
+	dosenGroup := router.Group("/dosen")
+	{
+		dosenGroup.GET("/", controllers.GetDosen)
+		dosenGroup.GET("/:nip", controllers.GetDosenByNip)
+		dosenGroup.POST("/", controllers.PostDosen)
+		dosenGroup.DELETE("/:nip", controllers.DeleteDosenByNip)
+	}
+
 	router.Run(":3000")
 }
