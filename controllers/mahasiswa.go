@@ -80,7 +80,6 @@ func PostMahasiswa(c *gin.Context){
 // get mahasiswa by npm
 func GetMahasiswaByNpm(c *gin.Context){
 	npm := c.Param("npm")
-	
 	npmUint, err := strconv.ParseUint(npm, 10, 32)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "NPM salah atau tidak ada"})

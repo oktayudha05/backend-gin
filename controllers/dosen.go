@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/oktayudha05/backend-gin/database"
@@ -67,8 +68,22 @@ func PostDosen(c *gin.Context){
 	c.IndentedJSON(http.StatusOK, newDosen)
 }
 
+// get dosen by nip
 func GetDosenByNip(c *gin.Context){
+	nip := c.Param("nip")
+	nipUint, err := strconv.ParseUint(nip, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "gagal format nip"})
+		return
+	}
 
+	var dosen models.Dosen
+	err = dbDosen.FindOne(context.Background(), bson.M{"nip": uint(nipUint)}).Decode(&dosen)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "data dengan nip " + nip + " tidak ditemukan"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, dosen)
 }
 
 func DeleteDosenByNip(c *gin.Context){
