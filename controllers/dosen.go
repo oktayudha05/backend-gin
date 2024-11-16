@@ -86,6 +86,22 @@ func GetDosenByNip(c *gin.Context){
 	c.IndentedJSON(http.StatusOK, dosen)
 }
 
+// delete dosen
 func DeleteDosenByNip(c *gin.Context){
-
+	nip := c.Param("nip")
+	nipUint, err := strconv.ParseUint(nip, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "gagal convert nip"})
+		return
+	}
+	
+	result, err := dbDosen.DeleteOne(context.Background(), bson.M{"nip": uint(nipUint)})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "gagal menghapus data"})
+		return
+	} else if result.DeletedCount == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "nip yang diberikan tidak cocok"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "berhasil menghapus data dengan nip " + nip})
 }
